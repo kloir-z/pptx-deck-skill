@@ -8,3 +8,6 @@ slide-*.jpg
 *-sheet*.jpg
 thumbnails*.jpg
 *.pdf
+
+# local shell state
+.pshistory
