@@ -17,10 +17,10 @@
     - ノード見出し .h は全角 5 文字以内に収める。超えるときは <br> を句の境界に
       入れる（語中で折り返されたまま出荷しない — 視覚 QA で必ず確認）
     - アイコン: <div class="ic"> 内の SVG を icons.html からコピーして差し替え。
-      ブランドロゴは `node pptx/scripts/brand_icon.js "GitHub" gh.svg` で取得し
+      ブランドロゴは `node scripts/brand_icon.js "GitHub" gh.svg` で取得し
       <img src="gh.svg"> か SVG を直接インライン化する
     - 注記が不要なら .note ごと削除し、.main の高さが増えた分ノードを大きくする
-  レンダリング: python pptx/scripts/render_html.py flow.html
+  レンダリング: python scripts/render_html.py flow.html
 -->
 <style>
   * { box-sizing: border-box; margin: 0; }

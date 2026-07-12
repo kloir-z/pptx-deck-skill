@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<!-- flow.html テンプレートを Indigo+Lavender (#13) に差し替えたもの -->
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  :root {
+    --bg:     #F5F3FF;
+    --mid:    #EDE9FE;
+    --main:   #3730A3;
+    --accent: #A78BFA;
+    --text:   #1E293B;
+    --muted:  #4B5563;
+    --light:  #6B7280;
+  }
+  body {
+    width: 2200px; height: 850px; background: var(--bg);
+    font-family: "BIZ UDPGothic", Meiryo, sans-serif; color: var(--text);
+    display: flex; flex-direction: column; padding: 36px 30px 30px;
+  }
+  .main { flex: 1; display: flex; align-items: center; justify-content: center; }
+  .grp {
+    position: relative; display: flex; align-items: center;
+    border: 5px dashed var(--main); border-radius: 24px;
+    padding: 96px 24px 76px;
+  }
+  .grp > .lbl {
+    position: absolute; top: 22px; left: 0; right: 0; text-align: center;
+    font-size: 44px; font-weight: bold; color: var(--main);
+  }
+  .grp > .tag {
+    position: absolute; bottom: 18px; left: 0; right: 0; text-align: center;
+    font-size: 34px; color: var(--light);
+  }
+  .box {
+    width: 230px; padding: 26px 14px; text-align: center;
+    background: var(--mid); border: 5px solid var(--main); border-radius: 16px;
+  }
+  .box .h { font-size: 40px; font-weight: bold; line-height: 1.25; }
+  .box .s { font-size: 34px; color: var(--muted); margin-top: 12px; line-height: 1.35; }
+  .box.dark   { background: var(--main); border-color: var(--main); color: #FFFFFF; }
+  .box.dark .s   { color: rgba(255,255,255,.82); }
+  .arr-r { flex: 0 0 50px; display: flex; align-items: center; }
+  .arr-r::before { content: ""; flex: 1; height: 6px; background: var(--main); }
+  .arr-r::after  { content: ""; border-left: 20px solid var(--main);
+                   border-top: 13px solid transparent; border-bottom: 13px solid transparent; }
+  .arr-lbl { flex: 0 0 96px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .arr-lbl .arr-r { align-self: stretch; flex: 0 0 auto; }
+  .arr-lbl .t { font-size: 34px; font-weight: bold; color: var(--main); }
+  .note {
+    margin-top: 26px; padding: 18px 28px;
+    background: var(--mid); border-left: 12px solid var(--accent);
+    font-size: 34px; color: var(--muted); line-height: 1.4;
+  }
+</style>
+</head>
+<body>
+  <div class="main">
+    <div class="grp">
+      <div class="lbl">Stage 1 — 計画</div>
+      <div class="box"><div class="h">種別判定</div><div class="s">タイプと<br>意図を決める</div></div>
+      <div class="arr-r"></div>
+      <div class="box"><div class="h">パレット</div><div class="s">3色を1組<br>だけ提案</div></div>
+      <div class="arr-r"></div>
+      <div class="box"><div class="h">構成案</div><div class="s">スライド表<br>密度を点検</div></div>
+      <div class="tag">─ コードはまだ書かない ─</div>
+    </div>
+    <div class="arr-lbl"><div class="arr-r"></div><div class="t">合意</div></div>
+    <div class="box dark"><div class="h">確認</div><div class="s">ユーザーが<br>構成を承認</div></div>
+    <div class="arr-lbl"><div class="arr-r"></div><div class="t">着手</div></div>
+    <div class="grp">
+      <div class="lbl">Stage 2 — 生成と検証</div>
+      <div class="box"><div class="h">JS 生成</div><div class="s">PptxGenJS<br>スクリプト</div></div>
+      <div class="arr-r"></div>
+      <div class="box"><div class="h">機械検査</div><div class="s">layout_lint<br>ERROR は必修正</div></div>
+      <div class="arr-r"></div>
+      <div class="box"><div class="h">視覚 QA</div><div class="s">描画画像を<br>確認</div></div>
+      <div class="tag">─ 指摘ゼロまで反復 ─</div>
+    </div>
+  </div>
+  <div class="note">
+    視覚 QA はスライドを画像化して行う — 重なり・はみ出し・語中折り返しはコードからは見えず、描画結果でしか確認できない
+  </div>
+</body>
+</html>

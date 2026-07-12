@@ -21,12 +21,12 @@
     - ノード: .node を増減。内側グループ内は .node.sm（低め）を使うと収まりがよい。
       アイコンは icons.html からコピー。GitHub 等の固有名詞ノードは brand_icon.js で
       公式ロゴ SVG を取得して差し替える:
-        node pptx/scripts/brand_icon.js "GitHub" github.svg
+        node scripts/brand_icon.js "GitHub" github.svg
       → 中身の <svg …> を .ic 内に貼る（モノトーンにしたい場合は brandIconSvg の
         color オプションで --main の hex を指定）
     - 接続線: svg.wires の <line> と <text>。y はノード中心（top + height/2）に合わせ、
       内側グループへの接続はグループ左辺まで引く。線ラベルには背景チップ <rect> を敷く
-  レンダリング: python pptx/scripts/render_html.py architecture.html
+  レンダリング: python scripts/render_html.py architecture.html
 -->
 <style>
   * { box-sizing: border-box; margin: 0; }
