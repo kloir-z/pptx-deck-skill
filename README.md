@@ -30,10 +30,10 @@ Claude Code のスキルディレクトリに clone するだけです。
 
 ```bash
 # ユーザー共通
-git clone https://github.com/<you>/pptx-deck-skill ~/.claude/skills/pptx-deck
+git clone https://github.com/kloir-z/pptx-deck-skill ~/.claude/skills/pptx-deck
 
 # または特定プロジェクトのみ
-git clone https://github.com/<you>/pptx-deck-skill <project>/.claude/skills/pptx-deck
+git clone https://github.com/kloir-z/pptx-deck-skill <project>/.claude/skills/pptx-deck
 ```
 
 ## 依存関係
