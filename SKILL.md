@@ -77,7 +77,9 @@ Decide both before outlining; they change every downstream rule.
    `\n` at phrase boundaries, sized to the box (chars per line ≈
    `boxWidth(in) × 72 / fontSize` for full-width chars). Fix overflow by
    shortening text or widening boxes — **never by shrinking the font below the
-   minimums.**
+   minimums.** Exception: **bulleted runs must not contain `\n`** (each `\n`
+   mints another bullet) — keep every bullet item to a single computed line
+   instead (see the cheatsheet's bullet rules).
 
 ## Size math (do it while writing, not after rendering)
 
@@ -100,6 +102,15 @@ Stage 1 and use exactly **3 colors at ~70:25:5 weight** (background / main /
 accent) for the whole deck. No fourth color mid-deck; light background on
 every slide (unless the chosen palette is the all-dark one). Photos and brand
 logos are imagery and exempt.
+
+Two clarifications that keep coming up:
+
+- **Semantic status colors** (green OK / red NG / amber warning) are allowed
+  **only** as text or badge color inside status cells of tables and
+  checklists. They are never headers, card fills, or decoration — a colored
+  category header is a palette violation, not a status.
+- **Choose the palette from the topic**, not by copying the bundled example
+  deck or a previous output. The example uses #13; that is not a default.
 
 ### Typography
 
@@ -133,6 +144,15 @@ Minimum payload per content slide: **4–7 information blocks**, or one rich
 visual (table / chart / diagram / image) plus 3+ supporting facts. Hero,
 section dividers, and quote slides are exempt. Every slide gets at least one
 visual element (shape, icon, chart, image) — never a bare text wall.
+
+**Visual variety (anti-monotony).** A deck where every slide is text cards
+and tables reads flat no matter how clean each slide is. In any deck of 8+
+content slides, at least one or two slides should carry a genuinely rich
+visual — a rendered diagram, a chart, or an image. Whenever the content
+itself has structure (a correspondence/mapping, a flow, a cycle, a
+hierarchy, a comparison), draw that structure with a diagram template
+instead of writing another card slide about it. Three consecutive slides
+with the same card layout is a monotony smell: vary the layout or merge them.
 
 ### Recurring structure
 

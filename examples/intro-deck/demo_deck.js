@@ -83,10 +83,12 @@ async function main() {
     const s = pres.addSlide(); bg(s); pageNum(s);
     msgTitle(s, "スキルの役割",
       "デッキ生成をコードで行い、機械検査と視覚確認までを1つの手順にする");
+    // 箇条書きは1項目=1行に収める（bullet 付き run に \n を入れると
+    // 行ごとに行頭記号が複製される — pptxgenjs は \n を段落分割として扱う）
     const cards = [
-      ["コード生成", ["スライドは PptxGenJS の\nJS スクリプトとして記述", "位置・寸法は事前に計算\n（描画してから直さない）", "レイアウトはサンプル13種\nから最も近いものを流用"]],
-      ["機械検査", ["layout_lint.py がはみ出し・\n重なり・極小フォントを検出", "ERROR は修正必須、\nWARN は画像で真偽を確認", "プレースホルダー残存も\nテキスト抽出で点検"]],
-      ["視覚 QA", ["soffice で PDF 化し\nページ画像を描画", "コンタクトシートで\n全スライドを一覧確認", "語中折り返し・重なりは\n画像でしか見つからない"]],
+      ["コード生成", ["PptxGenJS の JS で記述", "寸法は書く前に計算する", "レイアウトは13種から流用", "図は PNG に描画して配置"]],
+      ["機械検査", ["lint がはみ出し等を検出", "ERROR は修正必須", "WARN は画像で真偽確認", "下限割れフォントも検出"]],
+      ["視覚 QA", ["PDF 化して画像で確認", "一覧はコンタクトシート", "折り返し・重なりを点検", "指摘ゼロまで反復する"]],
     ];
     const cw = 2.93, chh = 2.9, gx = 0.11, x0 = 0.5, y0 = 1.62;
     cards.forEach((c, i) => {
@@ -95,8 +97,8 @@ async function main() {
       s.addShape(OVAL, { x: x + 0.22, y: y0 + 0.2, w: 0.42, h: 0.42, fill: { color: C.main }, line: { type: "none" } });
       s.addText(String(i + 1), { x: x + 0.22, y: y0 + 0.2, w: 0.42, h: 0.42, fontFace: FONT, fontSize: 15, bold: true, color: C.white, align: "center", valign: "middle", margin: 0 });
       s.addText(c[0], { x: x + 0.76, y: y0 + 0.2, w: cw - 0.9, h: 0.42, fontFace: FONT, fontSize: 14, bold: true, color: C.main, valign: "middle", margin: 0 });
-      const runs = c[1].map((t, j) => ({ text: t, options: { bullet: { indent: 12 }, breakLine: true, paraSpaceAfter: j === c[1].length - 1 ? 0 : 6 } }));
-      s.addText(runs, { x: x + 0.24, y: y0 + 0.78, w: cw - 0.44, h: chh - 0.95, fontFace: FONT, fontSize: 10.5, color: C.gray, valign: "top", margin: 0, lineSpacingMultiple: 1.12 });
+      const runs = c[1].map((t, j) => ({ text: t, options: { bullet: { indent: 12 }, breakLine: true, paraSpaceAfter: j === c[1].length - 1 ? 0 : 8 } }));
+      s.addText(runs, { x: x + 0.24, y: y0 + 0.78, w: cw - 0.44, h: chh - 0.95, fontFace: FONT, fontSize: 11.5, color: C.gray, valign: "top", margin: 0, lineSpacingMultiple: 1.12 });
     });
     noteBand(s, "描画結果を見る工程まで含めて「生成」と定義する。コードを書いて終わり、にしない。", 4.72);
     s.addNotes("スキルの3本柱。SKILL.md の Workflow / QA pipeline に対応。");

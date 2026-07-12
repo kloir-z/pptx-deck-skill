@@ -35,10 +35,17 @@ s.addText("string or runs", {
 - Multi-style paragraphs: pass an array of runs
   `[{ text, options: { bold: true, breakLine: false } }, …]`.
   `breakLine: true` ends the paragraph.
-- `\n` inside a run starts a **new paragraph** — in a bulleted run each line
-  gets its own bullet. For a wrapped bullet item, either keep it to one line
-  or use a bold-label run (with `bullet`) followed by a plain run.
 - Bullets: `bullet: { indent: 14 }` on the run; `paraSpaceAfter: 5` for gaps.
+- **Bullet items: one paragraph = one bullet — budget each item to ONE line.**
+  Verified render behavior:
+  - `\n` inside a bulleted run starts a new paragraph and **mints another
+    bullet on every line** — never do this.
+  - A long item without `\n` auto-wraps under a single bullet with a clean
+    hanging indent, but CJK auto-wrap can split mid-word and strand a lone
+    trailing character.
+  - So: compute the char budget (`boxWidth × 72 / fontSize` full-width chars)
+    and shorten each item until it fits one line, or split the thought into
+    two items / a bold-label run + plain run.
 - There is no auto-fit; do the size math yourself before writing the call.
 
 ## Shapes
@@ -101,6 +108,23 @@ s.addChart(pres.charts.BAR, [{ name: "系列", labels: [...], values: [...] }], 
 
 Keep chart colors inside the deck's 3-color palette.
 
+## Standard slide chrome (proven geometry, 10 × 5.625" canvas)
+
+Coordinates that have survived visual QA — start here instead of guessing:
+
+- **Two-tier title**: topic label 13–14pt bold accent-color at `y:0.32 h:0.26`;
+  conclusion sentence 19pt bold at `y:0.60 h:0.78` (2 lines max, explicit `\n`
+  at a phrase boundary when it wraps).
+- **Content zone**: `y:1.62` down to ~4.6. Bottom note band at `y ≥ 4.5` with
+  `y + h ≤ 5.125` (0.5" bottom margin).
+- **Page number**: `x:8.55 y:5.28 w:0.95` right-aligned 10pt — keep the
+  bottom-right corner clear of other elements.
+- **Left accent bar on a card**: bar `w:0.07` at the card's `x`; the text
+  block starts at `x + 0.24`. Never give a bar and its text the same `x` —
+  the bar overlaps the first character.
+- **Cards in a row**: 3 cards → `w:2.93 gap:0.11` from `x:0.5`; 2 columns →
+  `w:4.4` at `x:0.5` and `x:5.1`.
+
 ## Notes, page numbers
 
 ```js
@@ -120,3 +144,7 @@ appends "` / N`" to that field post-generation.
 - `\n` in bulleted runs → duplicated bullets (see Text above).
 - Shadows on tiny shapes → muddy; reserve for cards.
 - Fonts not set per call → renderer default (not BIZ UDPGothic).
+- 9.5pt looks harmless but breaks the 10pt floor — `layout_lint.py` rejects it.
+  When body text feels tight, cut words or widen the box, don't shave points.
+- Verifying the install: `require('pptxgenjs')` works;
+  `require('pptxgenjs/package.json')` throws (blocked by package `exports`).

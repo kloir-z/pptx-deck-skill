@@ -68,6 +68,7 @@ const C = {
 
 - Replace `main` and `accent` with your chosen palette's values. Adjust `lightBg` and `midBg` to match the background column.
 - Apply the chosen palette consistently to **all** backgrounds, shapes, icons, and text accents. Never introduce a 4th color mid-deck.
+- **Semantic status colors** — green `16A34A` (OK), red `DC2626` (NG), amber `D97706` (warning) — are permitted **only** as text/badge color in status cells of tables and checklists. Never use them for headers, card fills, bars, or any decorative element; a colored category header is a palette violation.
 - Palette #9 is the only dark-background option — every slide uses `113160` background. Do not mix with light slides.
 - Palettes #10–#12 are monochrome. Main and accent have low color contrast — differentiate via font weight (bold), size, and opacity instead of color alone. Use `midBg` for subtle row/section distinction.
 - midBg values: #10 `F0F0F0`, #11 `F0EEEB`, #12 `EFF2F5`, #13 `EDE9FE`.
