@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<!--
+  flow.html — 横フロー図（グループ枠 + 中継ノード + 注記バンド）
+
+  用途   : 処理の流れ・パイプライン・データの受け渡し。担当領域（クラウド/ローカル等）を
+           点線グループで囲み、境界をまたぐ受け渡し役を中央の濃色ノードで表す。
+  canvas : 2200x850 (2.59:1) — 横長。スライドには full-width（例 x:0.5 y:1.3 w:9.0 h:3.47）
+           で置くか、diagram-image レイアウトのパネルを広げて使う。
+           ※ 9.0" 配置時 244px/inch → 最小フォント 34px（10pt 相当）
+  カスタマイズポイント:
+    - :root のパレット変数（デッキの C 定数と同じ hex に差し替える）
+    - .box の数・グループの数（幅が溢れたらノード幅 .box の width と矢印 .arr-r の
+      flex-basis を詰めるか、ノードを減らす。フォントは縮めない）
+    - ノード見出し .h は全角 5 文字以内に収める。超えるときは <br> を句の境界に
+      入れる（語中で折り返されたまま出荷しない — 視覚 QA で必ず確認）
+    - アイコン: <div class="ic"> 内の SVG を icons.html からコピーして差し替え。
+      ブランドロゴは `node pptx/scripts/brand_icon.js "GitHub" gh.svg` で取得し
+      <img src="gh.svg"> か SVG を直接インライン化する
+    - 注記が不要なら .note ごと削除し、.main の高さが増えた分ノードを大きくする
+  レンダリング: python pptx/scripts/render_html.py flow.html
+-->
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  :root {
+    --bg:     #FFFFFF;   /* canvas 背景 — 置き先（カード白 or lightBg）に合わせる */
+    --mid:    #EFF6FF;   /* midBg  — ノード塗り */
+    --main:   #1E3A8A;   /* main   — 枠線・矢印・見出し */
+    --accent: #F97316;   /* accent — ハイライト（1〜2箇所だけ） */
+    --text:   #1E293B;   /* darkText — ノード見出し */
+    --muted:  #4B5563;   /* gray — 説明文 */
+    --light:  #6B7280;   /* lightText — 補足ラベル */
+  }
+  body {
+    width: 2200px; height: 850px; background: var(--bg);
+    font-family: "BIZ UDPGothic", Meiryo, sans-serif; color: var(--text);
+    display: flex; flex-direction: column; padding: 36px 30px 30px;
+  }
+
+  .main { flex: 1; display: flex; align-items: center; justify-content: center; }
+
+  /* ── 担当領域のグループ枠 ── */
+  .grp {
+    position: relative; display: flex; align-items: center;
+    border: 5px dashed var(--main); border-radius: 24px;
+    padding: 96px 24px 76px;
+  }
+  .grp > .lbl {
+    position: absolute; top: 22px; left: 0; right: 0; text-align: center;
+    font-size: 44px; font-weight: bold; color: var(--main);
+  }
+  .grp > .tag {
+    position: absolute; bottom: 18px; left: 0; right: 0; text-align: center;
+    font-size: 34px; color: var(--light);
+  }
+
+  /* ── 工程ノード ── */
+  .box {
+    width: 230px; padding: 26px 14px; text-align: center;
+    background: var(--mid); border: 5px solid var(--main); border-radius: 16px;
+  }
+  .box .h { font-size: 40px; font-weight: bold; line-height: 1.25; }
+  .box .s { font-size: 34px; color: var(--muted); margin-top: 12px; line-height: 1.35; }
+
+  /* 中継ノード（濃色）と強調ノード（accent）── 各1回だけ使う */
+  .box.dark   { background: var(--main); border-color: var(--main); color: #FFFFFF; }
+  .box.dark .s   { color: rgba(255,255,255,.82); }
+  .box.strong { background: var(--accent); border-color: var(--accent); color: #FFFFFF; }
+  .box.strong .s { color: rgba(255,255,255,.88); }
+
+  /* ── 矢印（シェイプ描画。テキストの「→」は使わない） ── */
+  .arr-r { flex: 0 0 50px; display: flex; align-items: center; }
+  .arr-r::before { content: ""; flex: 1; height: 6px; background: var(--main); }
+  .arr-r::after  { content: ""; border-left: 20px solid var(--main);
+                   border-top: 13px solid transparent; border-bottom: 13px solid transparent; }
+  /* ラベル付き矢印（グループ間の受け渡し） */
+  .arr-lbl { flex: 0 0 96px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .arr-lbl .arr-r { align-self: stretch; flex: 0 0 auto; }
+  .arr-lbl .t { font-size: 34px; font-weight: bold; color: var(--main); }
+
+  /* ── 下部の注記バンド ── */
+  .note {
+    margin-top: 26px; padding: 18px 28px;
+    background: var(--mid); border-left: 12px solid var(--accent);
+    font-size: 34px; color: var(--muted); line-height: 1.4;
+  }
+</style>
+</head>
+<body>
+  <div class="main">
+    <div class="grp">
+      <div class="lbl">クラウド側 — 毎日 7:00・17:15</div>
+      <div class="box"><div class="h">情報収集</div><div class="s">英8・日5<br>ソース</div></div>
+      <div class="arr-r"></div>
+      <div class="box"><div class="h">検証・要約</div><div class="s">ファクト<br>チェック必須</div></div>
+      <div class="arr-r"></div>
+      <div class="box"><div class="h">台本生成</div><div class="s">2キャラ会話<br>＋字幕辞書</div></div>
+      <div class="tag">─ LLM 工程 ─</div>
+    </div>
+    <div class="arr-lbl"><div class="arr-r"></div><div class="t">push</div></div>
+    <div class="box dark"><div class="h">GitHub</div><div class="s">成果物の<br>受け渡し役</div></div>
+    <div class="arr-lbl"><div class="arr-r"></div><div class="t">pull</div></div>
+    <div class="grp">
+      <div class="lbl">ローカル PC — 7:30・17:45 起動</div>
+      <div class="box"><div class="h">台本検知</div><div class="s">5分毎の<br>ポーリング</div></div>
+      <div class="arr-r"></div>
+      <div class="box"><div class="h">音声合成</div><div class="s">Modal L4<br>約1分</div></div>
+      <div class="arr-r"></div>
+      <div class="box strong"><div class="h">mp3 完成</div><div class="s">字幕・章<br>メタつき</div></div>
+      <div class="tag">─ 決定論的工程 ─</div>
+    </div>
+  </div>
+  <div class="note">
+    Modal（GPU クラウド）への接続はローカルからのみ — クラウド環境はプロキシの SSL 検査で gRPC が通らないため、この分業にした
+  </div>
+</body>
+</html>

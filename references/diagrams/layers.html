@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<!--
+  layers.html — レイヤー構成図（スタック）
+
+  用途   : システムの層構造（アプリ / 実行基盤 / インフラ）、技術スタック、
+           抽象度の上下関係。上が利用者に近い層。
+  canvas : 1650x1000 (1.65:1) — diagram-image レイアウトのパネル（6.1" x 3.7"）向け。
+           ※ 6.1" 配置時 270px/inch → 最小フォント 38px（10pt 相当）
+  カスタマイズポイント:
+    - :root のパレット変数（デッキの C 定数に合わせる）
+    - 層の数: .layer を増減（3〜4層が読みやすい。5層以上は縦が詰まるので統合を検討）
+    - 層内のセル数: .cell を増減（1層あたり 2〜4個）
+    - 強調: 話の主役の層だけ .layer に .focus を付ける（accent の左帯）— 1層だけ
+    - アイコン: .cell 先頭に icons.html の SVG を入れてもよい（任意）
+  レンダリング: python pptx/scripts/render_html.py layers.html
+-->
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  :root {
+    --bg:     #FFFFFF;
+    --mid:    #EFF6FF;
+    --main:   #1E3A8A;
+    --accent: #F97316;
+    --text:   #1E293B;
+    --muted:  #4B5563;
+    --light:  #6B7280;
+  }
+  body {
+    width: 1650px; height: 1000px; background: var(--bg);
+    font-family: "BIZ UDPGothic", Meiryo, sans-serif; color: var(--text);
+    display: flex; flex-direction: column; gap: 28px; padding: 46px 50px;
+  }
+
+  /* ── 層 ── */
+  .layer {
+    position: relative; overflow: hidden;
+    flex: 1; display: flex; align-items: center; gap: 26px;
+    background: var(--mid); border: 4px solid var(--main); border-radius: 18px;
+    padding: 24px 28px 24px 44px;
+  }
+  /* 強調層の帯は枠の内側に描く（border-left だと角丸からはみ出す） */
+  .layer.focus::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 18px;
+    background: var(--accent);
+  }
+
+  /* 層ラベル（左端） */
+  .lab { flex: 0 0 300px; }
+  .lab .h { font-size: 46px; font-weight: bold; color: var(--main); line-height: 1.2; }
+  .lab .s { font-size: 36px; color: var(--light); margin-top: 8px; }
+
+  /* 層内の構成要素 */
+  .cell {
+    flex: 1; background: #FFFFFF; border: 3px solid var(--main); border-radius: 12px;
+    padding: 22px 16px; text-align: center; align-self: stretch;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .cell .h { font-size: 40px; font-weight: bold; line-height: 1.25; }
+  .cell .s { font-size: 34px; color: var(--muted); margin-top: 10px; line-height: 1.35; }
+</style>
+</head>
+<body>
+  <div class="layer">
+    <div class="lab"><div class="h">アプリ層</div><div class="s">利用者との接点</div></div>
+    <div class="cell"><div class="h">Web GUI</div><div class="s">FastAPI 常駐</div></div>
+    <div class="cell"><div class="h">CLI / REPL</div><div class="s">対話実行</div></div>
+    <div class="cell"><div class="h">スキル連携</div><div class="s">Claude Code<br>から起動</div></div>
+  </div>
+  <div class="layer focus">
+    <div class="lab"><div class="h">実行基盤層</div><div class="s">今日の主役</div></div>
+    <div class="cell"><div class="h">推論サーバ</div><div class="s">llama.cpp サーバモード</div></div>
+    <div class="cell"><div class="h">モデル管理</div><div class="s">GGUF を Volume に常駐</div></div>
+  </div>
+  <div class="layer">
+    <div class="lab"><div class="h">インフラ層</div><div class="s">サーバレス GPU</div></div>
+    <div class="cell"><div class="h">Modal L4</div><div class="s">従量課金・自動停止</div></div>
+    <div class="cell"><div class="h">Volume</div><div class="s">モデル 19GB を<br>永続化</div></div>
+    <div class="cell"><div class="h">Secrets</div><div class="s">HF トークン管理</div></div>
+  </div>
+</body>
+</html>

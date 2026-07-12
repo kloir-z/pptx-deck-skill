@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<!--
+  architecture.html — システム構成図（ゾーン + 入れ子グループ + アイコンノード + 接続線）
+
+  用途   : コンポーネントの配置と通信経路。実行環境の境界（ローカル / クラウド /
+           外部サービス）をゾーン枠で示し、ノードはアイコン + 名前 + 役割 1 行。
+  canvas : 1650x1000 (1.65:1) — diagram-image パネル向け。
+           見出し 38px 以上・補足テキスト 34px 以上。
+  階層の描き分け（ネストは 2 段まで。それ以上は tree.html か図の分割）:
+    - 外側ゾーン .zone        = 環境・場所の境界 … 太い点線 (5px dashed) + 42px ラベル
+    - 内側グループ .zone.inner = デプロイ単位・論理グループ … 細い実線 (3px solid) + 34px ラベル
+    - ノード .node            = コンポーネント … 塗り (mid) + 4px 実線
+    点線 = 物理・環境の境界、実線 = 論理的なまとまり、という意味づけを崩さない。
+  カスタマイズポイント:
+    - :root のパレット変数
+    - ゾーン: .zone の position/size を調整（外側 2〜3 ゾーンまで）。幅の狭いゾーンでは
+      サブラベル .zs は置かない（ラベルと重なる）
+    - ノード: .node を増減。内側グループ内は .node.sm（低め）を使うと収まりがよい。
+      アイコンは icons.html からコピー。GitHub 等の固有名詞ノードは brand_icon.js で
+      公式ロゴ SVG を取得して差し替える:
+        node pptx/scripts/brand_icon.js "GitHub" github.svg
+      → 中身の <svg …> を .ic 内に貼る（モノトーンにしたい場合は brandIconSvg の
+        color オプションで --main の hex を指定）
+    - 接続線: svg.wires の <line> と <text>。y はノード中心（top + height/2）に合わせ、
+      内側グループへの接続はグループ左辺まで引く。線ラベルには背景チップ <rect> を敷く
+  レンダリング: python pptx/scripts/render_html.py architecture.html
+-->
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  :root {
+    --bg:     #FFFFFF;
+    --mid:    #EFF6FF;
+    --main:   #1E3A8A;
+    --accent: #F97316;
+    --text:   #1E293B;
+    --muted:  #4B5563;
+    --light:  #6B7280;
+  }
+  body {
+    width: 1650px; height: 1000px; background: var(--bg);
+    font-family: "BIZ UDPGothic", Meiryo, sans-serif; color: var(--text);
+    position: relative;
+  }
+
+  /* ── 接続線（背面 SVG） ── */
+  svg.wires { position: absolute; inset: 0; width: 100%; height: 100%; }
+  svg.wires line { stroke: var(--main); stroke-width: 5; }
+  svg.wires .chip { fill: #FFFFFF; stroke: var(--main); stroke-width: 2; }
+  svg.wires text { font-family: "BIZ UDPGothic", Meiryo, sans-serif; font-size: 34px;
+                   font-weight: bold; fill: var(--main); text-anchor: middle; }
+
+  /* ── 外側ゾーン枠（環境の境界: 点線） ── */
+  .zone {
+    position: absolute; border: 5px dashed var(--main); border-radius: 24px;
+  }
+  .zone > .zl {
+    position: absolute; top: 22px; left: 34px;
+    font-size: 42px; font-weight: bold; color: var(--main);
+  }
+  .zone > .zs {
+    position: absolute; top: 30px; right: 34px;
+    font-size: 34px; color: var(--light);
+  }
+
+  /* ── 内側グループ（論理グループ: 実線・細枠・小ラベル） ── */
+  .zone.inner { border: 3px solid var(--main); border-radius: 16px; }
+  .zone.inner > .zl { top: 18px; font-size: 34px; }
+  .zone.inner > .zs { top: 22px; font-size: 34px; }
+
+  /* ── ノード（アイコン + 名前 + 役割） ── */
+  .node {
+    position: absolute; width: 380px; min-height: 168px;
+    background: var(--mid); border: 4px solid var(--main); border-radius: 16px;
+    display: flex; align-items: center; gap: 20px; padding: 14px 24px;
+  }
+  .node.sm     { min-height: 145px; }                        /* 内側グループ用の低め */
+  .node.plain  { background: #FFFFFF; }                      /* ゾーン外の外部要素 */
+  .node.strong { border-color: var(--accent); border-width: 6px; }
+  .node .ic  { flex: 0 0 68px; color: var(--main); }
+  .node .ic svg { width: 68px; height: 68px; display: block; }
+  .node .h { font-size: 40px; font-weight: bold; line-height: 1.2; }
+  .node .s { font-size: 34px; color: var(--muted); margin-top: 6px; line-height: 1.3; }
+</style>
+</head>
+<body>
+  <svg class="wires" viewBox="0 0 1650 1000">
+    <line x1="510" y1="314" x2="783" y2="314"/>
+    <line x1="510" y1="624" x2="783" y2="624"/>
+    <line x1="280" y1="410" x2="280" y2="528"/>
+    <rect class="chip" x="571" y="277" width="150" height="52" rx="10"/>
+    <text x="646" y="314">HTTPS</text>
+    <rect class="chip" x="571" y="587" width="150" height="52" rx="10"/>
+    <text x="646" y="624">gRPC</text>
+  </svg>
+
+  <!-- 外側ゾーン: ローカル（幅の狭いゾーンではサブラベル .zs は置かない） -->
+  <div class="zone" style="left: 40px; top: 130px; width: 470px; height: 660px;">
+    <div class="zl">ローカル PC</div>
+  </div>
+  <div class="node" style="left: 70px; top: 230px; width: 420px;">
+    <div class="ic"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="10" width="36" height="28" rx="3"/><path d="M6 18 h36"/><circle cx="11.5" cy="14" r="1.5" fill="currentColor" stroke="none"/><circle cx="16.5" cy="14" r="1.5" fill="currentColor" stroke="none"/><circle cx="21.5" cy="14" r="1.5" fill="currentColor" stroke="none"/></svg></div>
+    <div><div class="h">Web GUI</div><div class="s">localhost:8000</div></div>
+  </div>
+  <div class="node" style="left: 70px; top: 540px; width: 420px;">
+    <div class="ic"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="10" width="36" height="28" rx="3"/><path d="M13 19 l6 5.5 -6 5.5"/><path d="M24 30 h11"/></svg></div>
+    <div><div class="h">CLI</div><div class="s">uv run chat.py</div></div>
+  </div>
+
+  <!-- 外側ゾーン: クラウド -->
+  <div class="zone" style="left: 740px; top: 130px; width: 870px; height: 790px;">
+    <div class="zl">Modal（サーバレス GPU）</div>
+    <div class="zs">us-east</div>
+  </div>
+
+  <!-- 内側グループ: デプロイ単位（実線・細枠） -->
+  <div class="zone inner" style="left: 783px; top: 232px; width: 784px; height: 450px;">
+    <div class="zl">推論 App</div>
+    <div class="zs">modal deploy 単位</div>
+  </div>
+  <div class="node sm strong" style="left: 818px; top: 318px; width: 714px;">
+    <div class="ic"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="14" width="20" height="20" rx="2"/><rect x="20" y="20" width="8" height="8"/><path d="M18 6 v8 M24 6 v8 M30 6 v8 M18 34 v8 M24 34 v8 M30 34 v8 M6 18 h8 M6 24 h8 M6 30 h8 M34 18 h8 M34 24 h8 M34 30 h8"/></svg></div>
+    <div><div class="h">推論コンテナ（L4 GPU）</div><div class="s">llama.cpp サーバ — 5 分で停止</div></div>
+  </div>
+  <div class="node sm" style="left: 818px; top: 492px; width: 714px;">
+    <div class="ic"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="24" cy="10" rx="16" ry="6"/><path d="M8 10 v28 c0 3.3 7.2 6 16 6 s16 -2.7 16 -6 V10"/><path d="M8 24 c0 3.3 7.2 6 16 6 s16 -2.7 16 -6"/></svg></div>
+    <div><div class="h">Volume</div><div class="s">GGUF モデル 19GB を永続化</div></div>
+  </div>
+
+  <!-- ゾーン直下のノード（グループ外） -->
+  <div class="node sm" style="left: 783px; top: 718px; width: 784px;">
+    <div class="ic"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="12" y="22" width="24" height="18" rx="3"/><path d="M17 22 v-6 a7 7 0 0 1 14 0 v6"/><circle cx="24" cy="29.5" r="2.4" fill="currentColor" stroke="none"/><path d="M24 32 v4"/></svg></div>
+    <div><div class="h">Secrets</div><div class="s">HF トークン — コードに埋め込まない</div></div>
+  </div>
+</body>
+</html>

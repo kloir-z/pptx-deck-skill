@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<!--
+  swimlane.html — スイムレーン図（担当 × フェーズ）
+
+  用途   : 「誰が・どの段階で・何をするか」。役割分担があるプロセスは
+           flow より先にこれを検討する。行 = 担当（人 / システム / 環境）、
+           列 = 時系列のフェーズ。
+  canvas : 1650x1000 (1.65:1) — diagram-image パネル向け。最小フォント 38px。
+  カスタマイズポイント:
+    - :root のパレット変数
+    - レーン数: .grid の grid-template-rows と .lane / セルを増減（2〜4 レーン）
+    - フェーズ数: grid-template-columns と .ph / セルを増減（3〜5 列）
+    - 空セル: そのフェーズに担当の作業がなければ <div class="cell"></div> のまま置く
+      （グリッドを崩さない）。カードで埋めない
+    - 強調: 主役のカード 1 つに .strong
+  レンダリング: python pptx/scripts/render_html.py swimlane.html
+-->
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  :root {
+    --bg:     #FFFFFF;
+    --mid:    #EFF6FF;
+    --main:   #1E3A8A;
+    --accent: #F97316;
+    --text:   #1E293B;
+    --muted:  #4B5563;
+    --light:  #6B7280;
+  }
+  body {
+    width: 1650px; height: 1000px; background: var(--bg);
+    font-family: "BIZ UDPGothic", Meiryo, sans-serif; color: var(--text);
+    padding: 40px 46px;
+  }
+  .grid {
+    width: 100%; height: 100%;
+    display: grid;
+    grid-template-columns: 250px repeat(4, 1fr);
+    grid-template-rows: 96px repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  /* ── フェーズ見出し（上端の行） ── */
+  .ph {
+    background: var(--main); color: #FFFFFF; border-radius: 12px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .ph .h { font-size: 38px; font-weight: bold; }
+  .ph .s { font-size: 34px; color: rgba(255,255,255,.8); margin-top: 2px; }
+
+  /* ── レーンラベル（左端の列） ── */
+  .lane {
+    background: var(--mid); border-radius: 12px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 0 12px;
+  }
+  .lane .h { font-size: 40px; font-weight: bold; color: var(--main); line-height: 1.2; }
+  .lane .s { font-size: 32px; color: var(--light); margin-top: 8px; }
+
+  /* ── セルとカード ── */
+  .cell {
+    border: 3px dashed #CBD5E1; border-radius: 12px;
+    display: flex; align-items: stretch;
+  }
+  .card {
+    flex: 1; margin: 10px; padding: 16px 18px;
+    background: #FFFFFF; border: 3px solid var(--main); border-radius: 10px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .card.strong { border-color: var(--accent); border-width: 5px; }
+  .card .h { font-size: 38px; font-weight: bold; line-height: 1.25; }
+  .card .s { font-size: 34px; color: var(--muted); margin-top: 8px; line-height: 1.3; }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div></div>
+    <div class="ph"><div class="h">収集</div><div class="s">7:00</div></div>
+    <div class="ph"><div class="h">生成</div><div class="s">7:05</div></div>
+    <div class="ph"><div class="h">合成</div><div class="s">7:30</div></div>
+    <div class="ph"><div class="h">利用</div><div class="s">8:00</div></div>
+
+    <div class="lane"><div class="h">クラウド</div><div class="s">routine</div></div>
+    <div class="cell"><div class="card"><div class="h">ニュース取得</div><div class="s">13 ソース巡回</div></div></div>
+    <div class="cell"><div class="card"><div class="h">台本を生成</div><div class="s">検証つきで push</div></div></div>
+    <div class="cell"></div>
+    <div class="cell"></div>
+
+    <div class="lane"><div class="h">ローカル PC</div><div class="s">常駐タスク</div></div>
+    <div class="cell"></div>
+    <div class="cell"></div>
+    <div class="cell"><div class="card strong"><div class="h">音声合成</div><div class="s">検知 → Modal L4 で mp3 化</div></div></div>
+    <div class="cell"></div>
+
+    <div class="lane"><div class="h">利用者</div><div class="s">通勤中</div></div>
+    <div class="cell"></div>
+    <div class="cell"></div>
+    <div class="cell"></div>
+    <div class="cell"><div class="card"><div class="h">再生</div><div class="s">git-viewer で聴取</div></div></div>
+  </div>
+</body>
+</html>

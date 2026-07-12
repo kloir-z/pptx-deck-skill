@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<!--
+  cycle.html — 循環図（サイクル）
+
+  用途   : 繰り返すプロセス（PDCA、改善ループ、運用サイクル）。
+           「終点が始点に戻る」ことが本質のときだけ使う。一方向の流れは flow.html。
+  canvas : 1650x1000 (1.65:1) — diagram-image パネル向け。最小フォント 38px。
+  カスタマイズポイント:
+    - :root のパレット変数
+    - ステップ数は 4 が基本形。3 にするなら .n2/.n4 系を捨てて弧を 120° 間隔で
+      引き直す（5 以上は円が混むので flow への変換を検討）
+    - 弧の座標: 中心 (825,500)・半径 310。点は x=825+310cosθ, y=500-310sinθ
+    - 強調: 主役ステップ 1 つに .strong（accent 枠）
+  レンダリング: python pptx/scripts/render_html.py cycle.html
+-->
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  :root {
+    --bg:     #FFFFFF;
+    --mid:    #EFF6FF;
+    --main:   #1E3A8A;
+    --accent: #F97316;
+    --text:   #1E293B;
+    --muted:  #4B5563;
+    --light:  #6B7280;
+  }
+  body {
+    width: 1650px; height: 1000px; background: var(--bg);
+    font-family: "BIZ UDPGothic", Meiryo, sans-serif; color: var(--text);
+    position: relative;
+  }
+
+  /* ── 円弧矢印（背面 SVG）──
+     弧と矢じりは --main を白と 1:1 で混ぜた色（同系の薄色）。半透明の重ね塗りだと
+     矢じりと線の重なりがムラになるのでソリッド色にする。パレット変更時は
+     ここと marker の fill を同時に差し替えること */
+  svg.ring { position: absolute; inset: 0; width: 100%; height: 100%; }
+  /* 直下の path だけに適用する（marker 内の矢じり path を巻き込まない） */
+  svg.ring > path { stroke: #8E9DC4; stroke-width: 7; fill: none; }
+
+  /* ── 中央ラベル ── */
+  .center {
+    position: absolute; left: 705px; top: 380px; width: 240px; height: 240px;
+    border-radius: 50%; background: var(--mid); border: 4px solid var(--main);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+  }
+  .center .h { font-size: 44px; font-weight: bold; color: var(--main); line-height: 1.2; }
+  .center .s { font-size: 34px; color: var(--muted); margin-top: 6px; }
+
+  /* ── ステップノード ── */
+  .step {
+    position: absolute; width: 400px;
+    background: #FFFFFF; border: 4px solid var(--main); border-radius: 16px;
+    padding: 22px 24px; display: flex; gap: 18px; align-items: flex-start;
+  }
+  .step.strong { border-color: var(--accent); border-width: 6px; }
+  .step .num {
+    flex: 0 0 56px; height: 56px; border-radius: 50%;
+    background: var(--main); color: #FFFFFF;
+    font-size: 36px; font-weight: bold;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step.strong .num { background: var(--accent); }
+  .step .h { font-size: 40px; font-weight: bold; line-height: 1.2; }
+  .step .s { font-size: 34px; color: var(--muted); margin-top: 8px; line-height: 1.35; }
+
+  .n1 { left: 625px; top:  55px; }
+  .n2 { left: 1210px; top: 415px; }
+  .n3 { left: 625px; top: 770px; }
+  .n4 { left:  40px; top: 415px; }
+</style>
+</head>
+<body>
+  <svg class="ring" viewBox="0 0 1650 1000">
+    <defs>
+      <marker id="ah" viewBox="0 0 12 10" refX="11" refY="5" markerWidth="8" markerHeight="6.7" orient="auto">
+        <path d="M0 0 L12 5 L0 10 z" fill="#8E9DC4"/>  <!-- ← svg.ring path の stroke と同色 -->
+      </marker>
+    </defs>
+    <path d="M905 201  A310 310 0 0 1 1124 420" marker-end="url(#ah)"/>
+    <path d="M1124 580 A310 310 0 0 1 905 799"  marker-end="url(#ah)"/>
+    <path d="M745 799  A310 310 0 0 1 526 580"  marker-end="url(#ah)"/>
+    <path d="M526 420  A310 310 0 0 1 745 201"  marker-end="url(#ah)"/>
+  </svg>
+
+  <div class="center"><div class="h">日次運用</div><div class="s">朝・夕 2回</div></div>
+
+  <div class="step n1"><div class="num">1</div><div><div class="h">収集</div><div class="s">13 ソースを取得</div></div></div>
+  <div class="step n2"><div class="num">2</div><div><div class="h">生成</div><div class="s">検証つきで<br>台本化し push</div></div></div>
+  <div class="step n3"><div class="num">3</div><div><div class="h">合成</div><div class="s">検知して mp3 化</div></div></div>
+  <div class="step n4 strong"><div class="num">4</div><div><div class="h">見直し</div><div class="s">聴取メモを<br>素材選定に反映</div></div></div>
+</body>
+</html>

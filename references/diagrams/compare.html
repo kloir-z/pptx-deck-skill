@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<!--
+  compare.html — 対比図（Before / After・現行 / 提案）
+
+  用途   : 変更の前後、2案の対置。同じ観点を同じ行に並べ、行単位で読ませる。
+           観点がバラバラなら表（data-table レイアウト）にする方が正確。
+  canvas : 1650x1000 (1.65:1) — diagram-image パネル向け。最小フォント 38px。
+  カスタマイズポイント:
+    - :root のパレット変数
+    - 行数: .row を増減（2〜4 行。各行 = 1 観点）
+    - 見出し語: Before/After を「現行 / 提案」「手動 / 自動化後」などに
+    - 左（Before）は無彩色トーン・右（After）は main トーンで「主役は右」を保つ
+  レンダリング: python pptx/scripts/render_html.py compare.html
+-->
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  :root {
+    --bg:     #FFFFFF;
+    --mid:    #EFF6FF;
+    --main:   #1E3A8A;
+    --accent: #F97316;
+    --text:   #1E293B;
+    --muted:  #4B5563;
+    --light:  #6B7280;
+  }
+  body {
+    width: 1650px; height: 1000px; background: var(--bg);
+    font-family: "BIZ UDPGothic", Meiryo, sans-serif; color: var(--text);
+    padding: 42px 48px;
+    display: grid; grid-template-columns: 1fr 130px 1fr;
+    grid-template-rows: 100px repeat(3, 1fr); gap: 20px 0;
+  }
+
+  /* ── ヘッダ ── */
+  .head {
+    border-radius: 14px; display: flex; align-items: center; justify-content: center;
+    font-size: 44px; font-weight: bold;
+  }
+  .head.before { background: #E2E8F0; color: var(--muted); }
+  .head.after  { background: var(--main); color: #FFFFFF; }
+
+  /* ── 行カード ── */
+  .card { border-radius: 14px; padding: 22px 30px; display: flex; flex-direction: column; justify-content: center; }
+  .card .t { font-size: 34px; font-weight: bold; color: var(--light); }
+  .card .h { font-size: 40px; font-weight: bold; line-height: 1.25; margin-top: 6px; }
+  .card .s { font-size: 34px; color: var(--muted); margin-top: 8px; line-height: 1.35; }
+  .card.before { background: #F1F5F9; border: 3px solid #CBD5E1; }
+  .card.after  { background: var(--mid); border: 3px solid var(--main); }
+  .card.after .t { color: var(--main); }
+
+  /* ── 行間の矢印（シェイプ描画。テキストの「→」は使わない） ── */
+  .arr { display: flex; align-items: center; padding: 0 22px; }
+  .arr::before { content: ""; flex: 1; height: 7px; background: var(--accent); }
+  .arr::after  { content: ""; border-left: 24px solid var(--accent);
+                 border-top: 16px solid transparent; border-bottom: 16px solid transparent; }
+</style>
+</head>
+<body>
+  <div class="head before">手動運用（3月まで）</div>
+  <div></div>
+  <div class="head after">自動運用（現在）</div>
+
+  <div class="card before">
+    <div class="t">題材の収集</div>
+    <div class="h">毎朝 30 分の手作業</div>
+    <div class="s">ブラウザで各サイトを巡回し、コピペで集約</div>
+  </div>
+  <div class="arr"></div>
+  <div class="card after">
+    <div class="t">題材の収集</div>
+    <div class="h">routine が 7:00 に自動巡回</div>
+    <div class="s">13 ソースを取得し、重複は台帳で除外</div>
+  </div>
+
+  <div class="card before">
+    <div class="t">台本の品質</div>
+    <div class="h">誤読・重複が混入</div>
+    <div class="s">読み間違いの修正は聴いてから気づく</div>
+  </div>
+  <div class="arr"></div>
+  <div class="card after">
+    <div class="t">台本の品質</div>
+    <div class="h">生成時に検証を強制</div>
+    <div class="s">ファクトチェックと読み辞書を通す</div>
+  </div>
+
+  <div class="card before">
+    <div class="t">音声化まで</div>
+    <div class="h">依頼してから半日</div>
+    <div class="s">PC の前にいるときだけ手動で合成を実行</div>
+  </div>
+  <div class="arr"></div>
+  <div class="card after">
+    <div class="t">音声化まで</div>
+    <div class="h">push から約 5 分</div>
+    <div class="s">ポーリング検知 → Modal L4 で 1 分合成</div>
+  </div>
+</body>
+</html>

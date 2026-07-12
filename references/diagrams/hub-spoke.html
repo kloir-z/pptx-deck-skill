@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<!--
+  hub-spoke.html — ハブ&スポーク図（中心 + 周辺要素）
+
+  用途   : 1つの中心（製品・チーム・データ基盤）と、それを取り巻く要素
+           （利用者・連携先・機能）の関係。フローではなく「つながり」を見せる図。
+  canvas : 1650x1000 (1.65:1) — diagram-image パネル向け。最小フォント 38px。
+  カスタマイズポイント:
+    - :root のパレット変数
+    - スポーク数: .spoke を増減（4〜6個が適正。7個以上は列を増やすより情報を統合する）
+      位置は .s1〜.s6 の top/left を調整。SVG の接続線 <line> も同数に合わせる
+      （line の x1,y1 = ハブ中心 825,500 / x2,y2 = 各スポークのハブ側辺の中点）
+    - アイコン: 各スポークの .ic 内 SVG を icons.html から差し替え
+    - 強調: 1つだけ .spoke に .strong を付けられる（accent 枠）
+  レンダリング: python pptx/scripts/render_html.py hub-spoke.html
+-->
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  :root {
+    --bg:     #FFFFFF;
+    --mid:    #EFF6FF;
+    --main:   #1E3A8A;
+    --accent: #F97316;
+    --text:   #1E293B;
+    --muted:  #4B5563;
+    --light:  #6B7280;
+  }
+  body {
+    width: 1650px; height: 1000px; background: var(--bg);
+    font-family: "BIZ UDPGothic", Meiryo, sans-serif; color: var(--text);
+    position: relative;
+  }
+
+  /* ── 接続線（背面の SVG レイヤー） ── */
+  svg.wires { position: absolute; inset: 0; width: 100%; height: 100%; }
+  svg.wires line { stroke: var(--main); stroke-width: 5; opacity: .45; }
+
+  /* ── 中央ハブ ── */
+  .hub {
+    position: absolute; left: 625px; top: 400px; width: 400px; height: 200px;
+    background: var(--main); border-radius: 24px; color: #FFFFFF;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 0 20px;
+  }
+  .hub .h { font-size: 52px; font-weight: bold; }
+  .hub .s { font-size: 34px; margin-top: 10px; color: rgba(255,255,255,.82); }
+
+  /* ── スポーク ── */
+  .spoke {
+    position: absolute; width: 520px; min-height: 170px;
+    background: var(--mid); border: 4px solid var(--main); border-radius: 16px;
+    display: flex; align-items: center; gap: 20px; padding: 18px 26px;
+  }
+  .spoke.strong { border-color: var(--accent); border-width: 6px; }
+  .spoke .ic { flex: 0 0 72px; color: var(--main); }
+  .spoke .ic svg { width: 72px; height: 72px; display: block; }
+  .spoke .h { font-size: 40px; font-weight: bold; line-height: 1.2; }
+  .spoke .s { font-size: 34px; color: var(--muted); margin-top: 6px; line-height: 1.3; }
+
+  /* 6スポークの定位置（左右3個ずつ） */
+  .s1 { left:  60px; top:  70px; }
+  .s2 { left:  30px; top: 415px; }
+  .s3 { left:  60px; top: 760px; }
+  .s4 { left: 1070px; top:  70px; }
+  .s5 { left: 1100px; top: 415px; }
+  .s6 { left: 1070px; top: 760px; }
+</style>
+</head>
+<body>
+  <svg class="wires" viewBox="0 0 1650 1000">
+    <line x1="825" y1="500" x2="580"  y2="155"/>
+    <line x1="825" y1="500" x2="550"  y2="500"/>
+    <line x1="825" y1="500" x2="580"  y2="845"/>
+    <line x1="825" y1="500" x2="1070" y2="155"/>
+    <line x1="825" y1="500" x2="1100" y2="500"/>
+    <line x1="825" y1="500" x2="1070" y2="845"/>
+  </svg>
+
+  <div class="hub"><div class="h">蔵書ライブラリ</div><div class="s">books リポジトリ<br>7冊・77ファイル</div></div>
+
+  <div class="spoke s1">
+    <div class="ic"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="15" y="6" width="18" height="36" rx="3"/><path d="M22 37 h4"/></svg></div>
+    <div><div class="h">撮影アプリ</div><div class="s">book-ocr-app で<br>ページ撮影</div></div>
+  </div>
+  <div class="spoke s2">
+    <div class="ic"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M14 37 a8.5 8.5 0 1 1 1.8-16.9 A11 11 0 0 1 37 23.5 a7 7 0 0 1 -2 13.5 z"/></svg></div>
+    <div><div class="h">OCR 基盤</div><div class="s">yomitoku-modal で<br>Markdown 化</div></div>
+  </div>
+  <div class="spoke s3">
+    <div class="ic"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M13 6 h16 l9 9 v27 H13 z"/><path d="M29 6 v9 h9"/><path d="M19 26 h10 M19 33 h10"/></svg></div>
+    <div><div class="h">toc.json</div><div class="s">章構成メタを<br>各本に同梱</div></div>
+  </div>
+  <div class="spoke s4">
+    <div class="ic"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="21" cy="21" r="11"/><path d="M29.5 29.5 L40 40"/></svg></div>
+    <div><div class="h">検索・引用</div><div class="s">Claude Code から<br>全文検索</div></div>
+  </div>
+  <div class="spoke s5 strong">
+    <div class="ic"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="10" width="36" height="28" rx="3"/><path d="M13 19 l6 5.5 -6 5.5"/><path d="M24 30 h11"/></svg></div>
+    <div><div class="h">要約・音声化</div><div class="s">irodori_studio の<br>題材ソース</div></div>
+  </div>
+  <div class="spoke s6">
+    <div class="ic"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="12" r="5"/><circle cx="11" cy="36" r="5"/><circle cx="37" cy="36" r="5"/><path d="M21.5 16.5 L13.5 31.5 M26.5 16.5 L34.5 31.5 M16 36 h16"/></svg></div>
+    <div><div class="h">git 管理</div><div class="s">テキストのみで<br>差分管理できる</div></div>
+  </div>
+</body>
+</html>

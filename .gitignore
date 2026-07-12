@@ -1,0 +1,10 @@
+node_modules/
+__pycache__/
+*.pyc
+
+# QA / build artifacts
+slide-*.png
+slide-*.jpg
+*-sheet*.jpg
+thumbnails*.jpg
+*.pdf

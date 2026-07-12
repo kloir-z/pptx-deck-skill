@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<!--
+  funnel.html — ファネル図（絞り込み）
+
+  用途   : 段階ごとに量が減っていく過程（候補の絞り込み、選考、コンバージョン）。
+           量の増減がない単なる手順は flow.html を使う。
+  canvas : 1650x1000 (1.65:1) — diagram-image パネル向け。最小フォント 38px。
+  カスタマイズポイント:
+    - :root のパレット変数
+    - 段数: .f1〜.f4 を増減（3〜5 段）。台形の幅は clip-path の % を等差で詰める。
+      色は main の濃淡（color-mix）で上から濃→淡、最終段のみ accent
+    - 右の説明列: .row を段と同数にする（.rows は各段と同じ高さ配分）
+    - 数値は説明側に置く（台形内は段名だけ — 中に詰め込むと折り返して読めない）
+  レンダリング: python pptx/scripts/render_html.py funnel.html
+-->
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  :root {
+    --bg:     #FFFFFF;
+    --mid:    #EFF6FF;
+    --main:   #1E3A8A;
+    --accent: #F97316;
+    --text:   #1E293B;
+    --muted:  #4B5563;
+    --light:  #6B7280;
+  }
+  body {
+    width: 1650px; height: 1000px; background: var(--bg);
+    font-family: "BIZ UDPGothic", Meiryo, sans-serif; color: var(--text);
+    display: flex; gap: 40px; padding: 46px 50px;
+  }
+
+  /* ── 左: ファネル ── */
+  .funnel { flex: 0 0 780px; display: flex; flex-direction: column; gap: 18px; }
+  .seg {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    color: #FFFFFF; font-size: 44px; font-weight: bold;
+  }
+  .f1 { background: var(--main); clip-path: polygon(0 0, 100% 0, 87.5% 100%, 12.5% 100%); }
+  .f2 { background: color-mix(in srgb, var(--main) 78%, white);
+        clip-path: polygon(12.5% 0, 87.5% 0, 75% 100%, 25% 100%); }
+  .f3 { background: color-mix(in srgb, var(--main) 56%, white);
+        clip-path: polygon(25% 0, 75% 0, 62.5% 100%, 37.5% 100%); }
+  .f4 { background: var(--accent); clip-path: polygon(37.5% 0, 62.5% 0, 56% 100%, 44% 100%); }
+
+  /* ── 右: 各段の説明 ── */
+  .rows { flex: 1; display: flex; flex-direction: column; gap: 18px; }
+  .row {
+    flex: 1; display: flex; align-items: center; gap: 24px;
+    border-bottom: 3px solid #E2E8F0; padding: 0 8px;
+  }
+  .row:last-child { border-bottom: none; }
+  .row .val { flex: 0 0 210px; font-size: 58px; font-weight: bold; color: var(--main); text-align: right; }
+  .row.last .val { color: var(--accent); }
+  .row .h { font-size: 40px; font-weight: bold; line-height: 1.2; }
+  .row .s { font-size: 34px; color: var(--muted); margin-top: 6px; line-height: 1.3; }
+</style>
+</head>
+<body>
+  <div class="funnel">
+    <div class="seg f1">収集記事</div>
+    <div class="seg f2">重複除外</div>
+    <div class="seg f3">検証通過</div>
+    <div class="seg f4">採用</div>
+  </div>
+  <div class="rows">
+    <div class="row">
+      <div class="val">142件</div>
+      <div><div class="h">13 ソースから収集</div><div class="s">英 8・日 5 サイトの新着</div></div>
+    </div>
+    <div class="row">
+      <div class="val">67件</div>
+      <div><div class="h">L1/L2 台帳で重複除外</div><div class="s">既報・クロス実行分を落とす</div></div>
+    </div>
+    <div class="row">
+      <div class="val">23件</div>
+      <div><div class="h">ファクトチェック通過</div><div class="s">一次ソースを確認できたもの</div></div>
+    </div>
+    <div class="row last">
+      <div class="val">8件</div>
+      <div><div class="h">台本に採用</div><div class="s">朝ダイジェスト 12 分ぶん</div></div>
+    </div>
+  </div>
+</body>
+</html>

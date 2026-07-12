@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<!--
+  tree.html — 階層ツリー（横方向・最大 4 階層）
+
+  用途   : 組織図・ディレクトリ構成・機能分解・分類。PptxGenJS の tree レイアウトより
+           深い階層／多いノードに耐える。ノード数が多く「深さ」が主役のときはこちら。
+  canvas : 1650x1000 (1.65:1) — diagram-image パネル向け。
+           全ノード 38px 以上（階層が深いほど装飾を軽くして視覚的な格を下げる）。
+  構造   : .branch（横 flex）= ノード + .trunk（幹線）+ .kids（子リスト・縦 flex）。
+           .branch を入れ子にするだけで任意の深さになる。枝線は CSS が自動で引く
+           （子側の ::before が水平枝、::after が縦の連結線）。
+  カスタマイズポイント:
+    - :root のパレット変数
+    - 階層: .branch のネストで増減。canvas 1650px の実用限界は 4 階層。
+      5 階層以上は図を分割するか、上位 2 階層で 1 枚・下位で 1 枚に分ける
+    - 末端ノード（leaf）は名前だけにする（.s を付けると縦に膨らむ。説明を
+      持たせるのは L1/L2 まで）
+    - 強調: 主役の枝のノード 1〜2 個に .strong
+    - ノードの縦間隔が詰まったら .kids の gap を広げるか leaf を減らす
+  レンダリング: python pptx/scripts/render_html.py tree.html
+-->
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  :root {
+    --bg:     #FFFFFF;
+    --mid:    #EFF6FF;
+    --main:   #1E3A8A;
+    --accent: #F97316;
+    --text:   #1E293B;
+    --muted:  #4B5563;
+    --light:  #6B7280;
+  }
+  body {
+    width: 1650px; height: 1000px; background: var(--bg);
+    font-family: "BIZ UDPGothic", Meiryo, sans-serif; color: var(--text);
+    display: flex; align-items: center; padding: 40px 48px;
+  }
+
+  /* ── ツリー骨格 ── */
+  .branch { display: flex; align-items: center; }
+  .trunk  { flex: 0 0 52px; height: 5px; background: var(--main); }
+  .kids   { display: flex; flex-direction: column; gap: 24px; margin-left: 52px; }
+  .kids > * { position: relative; }
+  /* 水平の枝（各子の中心へ） */
+  .kids > *::before {
+    content: ""; position: absolute; left: -52px; top: 50%; margin-top: -2.5px;
+    width: 52px; height: 5px; background: var(--main);
+  }
+  /* 縦の連結線（最初の子〜最後の子の中心まで） */
+  .kids > *::after {
+    content: ""; position: absolute; left: -52px; width: 5px;
+    top: -14px; bottom: -14px; background: var(--main);
+  }
+  .kids > *:first-child::after { top: 50%; }
+  .kids > *:last-child::after  { bottom: 50%; }
+  .kids > *:only-child::after  { display: none; }
+
+  /* ── ノード（深い階層ほど軽い装飾） ── */
+  .tnode {
+    flex-shrink: 0; border-radius: 12px; padding: 16px 26px;
+    background: #FFFFFF; border: 3px solid var(--main);
+  }
+  .tnode .h { font-size: 38px; font-weight: bold; line-height: 1.2; }
+  .tnode .s { font-size: 34px; color: var(--muted); margin-top: 6px; line-height: 1.3; }
+  .tnode.l1 { background: var(--main); border-color: var(--main); color: #FFFFFF; padding: 26px 34px; border-radius: 18px; }
+  .tnode.l1 .h { font-size: 46px; }
+  .tnode.l1 .s { color: rgba(255,255,255,.82); }
+  .tnode.l2 { background: var(--mid); border-width: 4px; }
+  .tnode.l2 .h { font-size: 40px; }
+  .tnode.strong { border-color: var(--accent); border-width: 5px; }
+</style>
+</head>
+<body>
+  <div class="branch">
+    <div class="tnode l1"><div class="h">irodori_studio</div><div class="s">音声スタジオ</div></div>
+    <div class="trunk"></div>
+    <div class="kids">
+
+      <div class="branch">
+        <div class="tnode l2"><div class="h">取得 flow</div><div class="s">題材の収集</div></div>
+        <div class="trunk"></div>
+        <div class="kids">
+          <div class="tnode"><div class="h">news_digest</div></div>
+          <div class="tnode"><div class="h">URL / PDF 取り込み</div></div>
+        </div>
+      </div>
+
+      <div class="branch">
+        <div class="tnode l2"><div class="h">音声化 auto</div><div class="s">台本 → mp3</div></div>
+        <div class="trunk"></div>
+        <div class="kids">
+          <div class="tnode"><div class="h">台本生成（LLM）</div></div>
+          <div class="branch">
+            <div class="tnode strong"><div class="h">合成ジョブ</div></div>
+            <div class="trunk"></div>
+            <div class="kids">
+              <div class="tnode"><div class="h">Modal L4</div></div>
+              <div class="tnode"><div class="h">SRT 字幕</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="branch">
+        <div class="tnode l2"><div class="h">配信</div><div class="s">聴取まで</div></div>
+        <div class="trunk"></div>
+        <div class="kids">
+          <div class="tnode"><div class="h">git-viewer プレーヤー</div></div>
+          <div class="tnode"><div class="h">章インデックス</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
